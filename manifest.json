@@ -1,0 +1,12 @@
+{
+  "name": "Dosbox plugin",
+  "platform": "AtariJaguar",
+  "guid": "c1236e5a-5f3a-4681-942a-746433f255ff",
+  "version": "0.2",
+  "description": "Dosbox plugin",
+  "author": "Roor",
+  "email": "hector@torum.com.ar",
+  "url": "",
+  "update_url": "",
+  "script": "plugin.py"
+}
