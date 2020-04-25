@@ -1,5 +1,6 @@
 import sys
 
+import os
 import subprocess
 import struct
 import threading
@@ -15,7 +16,6 @@ from galaxy.api.plugin import Plugin, create_and_run_plugin
 from galaxy.api.types import Game, LicenseInfo, LicenseType, Authentication, LocalGame, NextStep
 from galaxy.api.consts import Platform, LocalGameState
 
-# Manually override if you dare
 roms_path = ""
 
 
@@ -122,7 +122,7 @@ class AuthenticationServer(threading.Thread):
         super().__init__()
         self.path = ""
         server_address = ('localhost', port)
-        self.httpd = HTTPServer(server_address, AuthenticationHandler)#partial(AuthenticationHandler, self))
+        self.httpd = HTTPServer(server_address, AuthenticationHandler)
         self.port = self.httpd.server_port
 
     def run(self):
@@ -132,8 +132,8 @@ class AuthenticationServer(threading.Thread):
 class DosboxPlugin(Plugin):
     def __init__(self, reader, writer, token):
         super().__init__(
-            Platform.AtariJaguar,  # Choose platform from available list
-            "0.2",  # Version
+            Platform.AtariJaguar,
+            "0.1", 
             reader,
             writer,
             token
@@ -153,7 +153,8 @@ class DosboxPlugin(Plugin):
         # Find game - lookup table would be good :P
         for game in self.games:
             if game.program_id == game_id:
-                subprocess.Popen(["c:\\Emulators\\DOSBox\\DosZipLaunch.exe", game.path])
+                modpath = "%localappdata%\\GOG.com\\Galaxy\\plugins\\installed\\atarijaguar_c1236e5a-5f3a-4681-942a-746433f255ff\\dosziplaunch.exe"
+                subprocess.Popen([modpath, game.path])
                 break
         return
 
@@ -165,10 +166,8 @@ class DosboxPlugin(Plugin):
         self.parse_games()
         return Authentication(user_id="a_high_quality_dosbox_user", user_name=roms_path)
 
-    # implement methods
     async def authenticate(self, stored_credentials=None):
         global roms_path
-        # See if we have the path in the cache
         if len(roms_path) == 0 and stored_credentials is not None and "roms_path" in stored_credentials:
             roms_path = stored_credentials["roms_path"]
 
@@ -212,23 +211,27 @@ class NCCHGame():
 
 
 def probe_game(path):
-    extension = os.path.splitext(filename)[1]
-    if (extension != "dosbox"):
+    title = os.path.basename(path)
+    ext = os.path.splitext(path)[1].lower()
+
+    title = title.replace("~", "-")
+
+    if ext != ".dosbox":
         return None
 
-    name = ntpath.basename(path)
+    if ext != ".dosbox" and ext != ".zip" and ext != ".DOSBOX" and ext != ".ZIP":
+        return None
 
-    program_id = name
+    title = os.path.splitext(title)[0]
+    title = title.replace(".zip","")
+    title = title.replace(".ZIP","")
+    title = title.replace("  "," ")
 
-    title = name
+    b = 0;
+    for a in title:
+        b = (b*2) + int(ord(a))
 
-    title_structs = []
-    short_desc = "Short detail - This is a DOSBOX GAME named " + name
-    long_desc = "Long detail - This is a DOSBOX GAME named " + name
-    publisher = "Publisher is unknown"
-    title_structs.append(long_desc)
-    
-    title = tile_structs;
+    program_id=str(b)
 
     return NCCHGame(program_id=program_id, game_title=title, path=path)
 
@@ -239,12 +242,14 @@ def get_files_in_dir(path):
 
 
 def get_games(path):
-    games_path = get_files_in_dir(path)
     games = []
-    for game_path in games_path:
-        game = probe_game(game_path)
-        if game is not None:
-            games.append(game)
+    allpaths = path.split(";")
+    for onepath in allpaths:
+        games_path = get_files_in_dir(onepath)
+        for game_path in games_path:
+            game = probe_game(game_path)
+            if game is not None:
+                games.append(game)
     return games
 
 
@@ -252,6 +257,5 @@ def main():
     create_and_run_plugin(DosboxPlugin, sys.argv)
 
 
-# run plugin event loop
 if __name__ == "__main__":
     main()
