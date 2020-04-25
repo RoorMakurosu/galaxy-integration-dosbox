@@ -63,8 +63,8 @@ class AuthenticationHandler(BaseHTTPRequestHandler):
                     overflow-x: hidden;
                 }
                 ::-webkit-scrollbar {
-                    width: 0px;  /* Remove scrollbar space */
-                    background: transparent;  /* Optional: just make scrollbar invisible */
+                    width: 0px;
+                    background: transparent;
                 }
 
                 .header {
@@ -131,13 +131,7 @@ class AuthenticationServer(threading.Thread):
 
 class DosboxPlugin(Plugin):
     def __init__(self, reader, writer, token):
-        super().__init__(
-            Platform.AtariJaguar,
-            "0.1", 
-            reader,
-            writer,
-            token
-        )
+        super().__init__(Platform.AtariJaguar, "0.1", reader, writer, token)
         self.games = []
         self.server = AuthenticationServer()
         self.server.start()
@@ -150,10 +144,9 @@ class DosboxPlugin(Plugin):
 
     async def launch_game(self, game_id):
         from os.path import join
-        # Find game - lookup table would be good :P
         for game in self.games:
             if game.program_id == game_id:
-                modpath = "%localappdata%\\GOG.com\\Galaxy\\plugins\\installed\\atarijaguar_c1236e5a-5f3a-4681-942a-746433f255ff\\dosziplaunch.exe"
+                modpath = "%%localappdata%%\\GOG.com\\Galaxy\\plugins\\installed\\atarijaguar_c1236e5a-5f3a-4681-942a-746433f255ff\\dosziplaunch.exe"
                 subprocess.Popen([modpath, game.path])
                 break
         return
@@ -190,8 +183,7 @@ class DosboxPlugin(Plugin):
         owned_games = []
         for game in self.games:
             license_info = LicenseInfo(LicenseType.OtherUserLicense, None)
-            owned_games.append(Game(game_id=game.program_id, game_title=game.game_title, dlcs=None,
-                        license_info=license_info))
+            owned_games.append(Game(game_id=game.program_id, game_title=game.game_title, dlcs=None, license_info=license_info))
 
         return owned_games
 
@@ -216,15 +208,14 @@ def probe_game(path):
 
     title = title.replace("~", "-")
 
-    if ext != ".dosbox":
-        return None
-
     if ext != ".dosbox" and ext != ".zip" and ext != ".DOSBOX" and ext != ".ZIP":
         return None
 
     title = os.path.splitext(title)[0]
     title = title.replace(".zip","")
     title = title.replace(".ZIP","")
+    title = title.replace(".dosbox","")
+    title = title.replace(".DOSBOX","")
     title = title.replace("  "," ")
 
     b = 0;
