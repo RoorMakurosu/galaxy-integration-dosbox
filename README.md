@@ -4,15 +4,13 @@ A GOG Galaxy 2.0 integration for Dosbox
 ## Features:
 - Add your DOS games to your Library.
 - Owned games are expected to be stored in ZIP files making them easier to manage.
-- Specify a folder when enabling the plugin. Multiple folders containing ZIP files can be setup (separated by semicolon ";")
+- Specify a folder when enabling the plugin. Multiple folders containing ZIP files can be setup (separated by semicolon ";". Ie "c:\DOSBOX;d:\MOREDOSBOX")
 - Only Windows is supported.
 
 ## How to Install:
 
 Download the .zip from the GitHub as a ZIP file, and extract the contents into your installed plugins folder.
 The default folderis at `%localappdata%\GOG.com\Galaxy\plugins\installed`
-
-2) Configure the plugin by editing the `config.py` file, and providing the desired paths and files.
 
 ## How to add games:
 Games can be stored in any folder, but need to be compressed as ZIP files.
@@ -29,8 +27,8 @@ Note:
 
 ## Known Issues/Caveats/Requirements:
 - The plugin will be listed as ATARI JAGUAR in GOG Galaxy... as DOS is not a supported platform at this time.
+- A version of heavily customized version of Dosbox is included. It might need Visual Studio 2019 Redistributables installed.
 - DotNet 4.0 is required for the executable "DosZipLaunch.exe"
-- Visual Studio 2019 Reditributable might be needed for the "Dosbox.exe"
 
 ## Acknowledgements
 - This DosBox.exe is heavily modified version of another Dosbox mod done by ykhwong.
